@@ -1,0 +1,1302 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+<meta name="theme-color" content="#1F4E79">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SAM HARMONIE">
+<link rel="manifest" href="manifest.json">
+<title>SAM HARMONIE PRO</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+:root{--blue:#1F4E79;--blue2:#2E75B6;--green:#276221;--red:#9C0006;--orange:#7B4F00;--purple:#534AB7}
+body{font-family:Arial,sans-serif;background:#f0f4fa;padding-bottom:65px;min-height:100vh}
+.topbar{background:var(--blue);padding:11px 14px 10px;position:sticky;top:0;z-index:50;display:flex;align-items:center;justify-content:space-between}
+.topbar-left h1{color:#fff;font-size:15px;font-weight:700}
+.topbar-left p{color:#BDD7EE;font-size:10px;margin-top:1px}
+.topbar-right{display:flex;gap:6px}
+.tbtn{background:rgba(255,255,255,0.15);color:#fff;border:none;border-radius:6px;padding:6px 10px;font-size:11px;cursor:pointer;font-weight:600}
+.install-bar{background:#EBF3FB;border-bottom:1px solid #BDD7EE;padding:10px 14px;display:none;align-items:center;gap:10px}
+.install-bar p{font-size:12px;color:var(--blue);flex:1}
+.install-bar button{background:var(--blue);color:#fff;border:none;border-radius:7px;padding:7px 12px;font-size:11px;font-weight:700;cursor:pointer}
+.page{display:none;animation:fadeIn 0.2s}
+.page.active{display:block}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:12px 12px 0}
+.stat{background:#fff;border-radius:10px;padding:10px 12px;border:0.5px solid #dde3ec}
+.stat .lbl{font-size:10px;color:#888;margin-bottom:2px}
+.stat .val{font-size:21px;font-weight:700}
+.stat.blue .val{color:var(--blue)}
+.stat.green .val{color:var(--green)}
+.stat.red .val{color:var(--red)}
+.stat.orange .val{color:var(--orange)}
+.stat.purple .val{color:var(--purple)}
+
+/* SEARCH */
+.search-row{padding:10px 12px;display:flex;gap:6px}
+.search-row input,.search-row select{font-size:12px;padding:8px 10px;border-radius:8px;border:1px solid #ccc;background:#fff}
+.search-row input{flex:1}
+
+/* LIST */
+.list-wrap{padding:0 12px}
+.item{background:#fff;border-radius:10px;border:0.5px solid #dde3ec;margin-bottom:8px;overflow:hidden}
+.item-head{padding:11px 12px;display:flex;justify-content:space-between;align-items:center;cursor:pointer}
+.item-left .nom{font-size:13px;font-weight:700;color:var(--blue)}
+.item-left .sub{font-size:10px;color:#888;margin-top:2px}
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-weight:700}
+.badge.en-cours{background:#C6EFCE;color:var(--green)}
+.badge.resilie{background:#FFC7CE;color:var(--red)}
+.badge.bientot{background:#FFEB9C;color:var(--orange)}
+.badge.vide{background:#eee;color:#888}
+.item-body{display:none;padding:0 12px 12px;border-top:0.5px solid #eee}
+.item-body.open{display:block}
+.fg{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.fg3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:8px}
+.f label{font-size:10px;color:#666;display:block;margin-bottom:3px}
+.f input{width:100%;font-size:12px;padding:6px 8px;border:1px solid #ccc;border-radius:6px}
+.f input[type=date]{font-size:11px}
+.f-full{grid-column:1/-1}
+.btn-row{display:flex;gap:8px;margin-top:10px}
+.btn{padding:8px 14px;border-radius:7px;border:none;cursor:pointer;font-size:12px;font-weight:700}
+.btn-blue{background:var(--blue);color:#fff;flex:1}
+.btn-red{background:#FFC7CE;color:var(--red)}
+.btn-green{background:#C6EFCE;color:var(--green)}
+
+/* DASHBOARD */
+.revenu-card{background:var(--blue);border-radius:12px;margin:12px;padding:16px;text-align:center}
+.revenu-card .rv{font-size:28px;font-weight:700;color:#fff}
+.revenu-card .rl{font-size:11px;color:#BDD7EE;margin-top:2px}
+.dash-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:0 12px 12px}
+.dc{background:#fff;border-radius:10px;padding:12px;border:0.5px solid #dde3ec;text-align:center}
+.dc .dv{font-size:26px;font-weight:700}
+.dc .dl{font-size:10px;color:#888;margin-top:2px}
+.section-title{font-size:11px;font-weight:700;color:#888;padding:8px 12px 4px;text-transform:uppercase;letter-spacing:0.5px}
+.alert-item{border-radius:8px;padding:10px 12px;margin:0 12px 6px;display:flex;justify-content:space-between;align-items:center}
+.alert-item.red{background:#fff;border-left:4px solid #E24B4A}
+.alert-item.orange{background:#fff;border-left:4px solid #EF9F27}
+.alert-item .an{font-size:12px;font-weight:600;color:#222}
+.alert-item .ad{font-size:10px;margin-top:2px}
+.alert-item.red .ad{color:var(--red)}
+.alert-item.orange .ad{color:var(--orange)}
+.chart-wrap{background:#fff;border-radius:10px;margin:0 12px 12px;padding:12px;border:0.5px solid #dde3ec}
+.chart-title{font-size:12px;font-weight:700;color:var(--blue);margin-bottom:10px}
+.bar-row{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.bar-label{font-size:10px;color:#666;width:80px;text-align:right;flex-shrink:0}
+.bar-track{flex:1;background:#eee;border-radius:4px;height:14px;overflow:hidden}
+.bar-fill{height:100%;border-radius:4px;transition:width 0.5s}
+.bar-val{font-size:10px;font-weight:700;min-width:30px}
+
+/* CONTRATS PAGE */
+.contract-card{background:#fff;border-radius:10px;margin:0 12px 8px;padding:12px;border:0.5px solid #dde3ec}
+.contract-card .cn{font-size:13px;font-weight:700;color:var(--blue)}
+.contract-card .ci{font-size:10px;color:#888;margin-top:2px}
+.contract-card .cd{display:flex;justify-content:space-between;margin-top:8px;font-size:11px}
+.progress-bar{background:#eee;border-radius:4px;height:6px;margin-top:6px;overflow:hidden}
+.progress-fill{height:100%;border-radius:4px}
+
+/* SEARCH PAGE */
+.search-page{padding:12px}
+.search-page input{width:100%;font-size:14px;padding:10px 12px;border-radius:10px;border:1px solid #ccc;background:#fff;margin-bottom:10px}
+.search-result{background:#fff;border-radius:10px;padding:12px;margin-bottom:8px;border:0.5px solid #dde3ec}
+.search-result .sr-nom{font-size:13px;font-weight:700;color:var(--blue)}
+.search-result .sr-info{font-size:11px;color:#666;margin-top:4px}
+
+/* FAB */
+.fab{position:fixed;bottom:74px;right:14px;width:50px;height:50px;background:var(--blue);color:#fff;border-radius:50%;border:none;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:40;box-shadow:0 3px 10px rgba(0,0,0,0.25)}
+
+/* BOTTOM NAV */
+.bottomnav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:0.5px solid #dde3ec;display:grid;grid-template-columns:repeat(5,1fr);z-index:50}
+.nav-btn{padding:8px 2px;text-align:center;cursor:pointer;border:none;background:none;font-size:9px;color:#aaa;font-weight:600}
+.nav-btn .ni{font-size:18px;display:block;margin-bottom:1px}
+.nav-btn.active{color:var(--blue)}
+
+/* MODAL */
+.modal-bg{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:100;align-items:flex-end}
+.modal-bg.open{display:flex}
+.modal{background:#fff;border-radius:16px 16px 0 0;padding:18px 14px 28px;width:100%;max-height:88vh;overflow-y:auto}
+.modal h2{font-size:14px;font-weight:700;color:var(--blue);margin-bottom:12px;display:flex;justify-content:space-between;align-items:center}
+.modal h2 span{font-size:18px;cursor:pointer;color:#aaa}
+.mf{margin-bottom:9px}
+.mf label{font-size:10px;color:#666;display:block;margin-bottom:3px}
+.mf input,.mf textarea,.mf select{width:100%;font-size:13px;padding:8px 10px;border:1px solid #ccc;border-radius:8px;background:#fff}
+.mf textarea{height:55px;resize:none}
+.mfg{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.mfooter{display:flex;gap:8px;margin-top:12px}
+.mfooter button{flex:1;padding:12px;border-radius:8px;border:none;cursor:pointer;font-size:13px;font-weight:700}
+.mfooter .mc{background:#f0f0f0;color:#444}
+.mfooter .ms{background:var(--blue);color:#fff}
+
+/* NOTIFICATION */
+.notif{position:fixed;top:60px;left:12px;right:12px;background:#276221;color:#fff;padding:10px 14px;border-radius:10px;font-size:12px;font-weight:600;z-index:200;display:none;text-align:center}
+.notif.show{display:block;animation:slideDown 0.3s}
+@keyframes slideDown{from{transform:translateY(-20px);opacity:0}to{transform:translateY(0);opacity:1}}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="topbar-left">
+    <h1>SAM HARMONIE PRO</h1>
+    <p>Domiciliation • Temara • ICE: 003509603000019</p>
+  </div>
+  <div class="topbar-right">
+    <button class="tbtn" onclick="exportPDF()">PDF</button>
+    <button class="tbtn" onclick="exportCSV()">CSV</button>
+  </div>
+</div>
+
+<div class="install-bar" id="install-bar">
+  <p>Installez cette app sur votre telephone</p>
+  <button onclick="installApp()">Installer</button>
+</div>
+
+<div class="notif" id="notif"></div>
+
+<!-- PAGE LISTE -->
+<div id="page-liste" class="page active">
+  <div class="stats-grid">
+    <div class="stat blue"><div class="lbl">Total societes</div><div class="val" id="s-total">0</div></div>
+    <div class="stat green"><div class="lbl">En cours</div><div class="val" id="s-encours">0</div></div>
+    <div class="stat red"><div class="lbl">Resilies</div><div class="val" id="s-resilie">0</div></div>
+    <div class="stat orange"><div class="lbl">Expire bientot</div><div class="val" id="s-bientot">0</div></div>
+  </div>
+  <div class="search-row">
+    <input id="search" placeholder="Rechercher nom ou RC..." oninput="renderListe()" />
+    <select id="filter" onchange="renderListe()">
+      <option value="">Tous</option>
+      <option value="en-cours">En cours</option>
+      <option value="bientot">Bientot</option>
+      <option value="resilie">Resilie</option>
+      <option value="vide">Sans date</option>
+    </select>
+  </div>
+  <div class="list-wrap" id="liste"></div>
+</div>
+
+<!-- PAGE DASHBOARD -->
+<div id="page-dash" class="page">
+  <div class="revenu-card">
+    <div class="rl">Revenu mensuel total</div>
+    <div class="rv" id="d-revenu">0 MAD</div>
+    <div class="rl" id="d-revenu-annuel" style="margin-top:4px;font-size:12px;color:#fff;opacity:0.8"></div>
+  </div>
+  <div class="dash-grid">
+    <div class="dc"><div class="dv" style="color:var(--blue)" id="d-total">0</div><div class="dl">Total</div></div>
+    <div class="dc"><div class="dv" style="color:var(--green)" id="d-ec">0</div><div class="dl">En cours</div></div>
+    <div class="dc"><div class="dv" style="color:var(--red)" id="d-res">0</div><div class="dl">Resilies</div></div>
+    <div class="dc"><div class="dv" style="color:var(--orange)" id="d-bi">0</div><div class="dl">Bientot</div></div>
+  </div>
+  <div class="chart-wrap">
+    <div class="chart-title">Repartition par etat</div>
+    <div id="chart-bars"></div>
+  </div>
+  <div class="section-title">Alertes — Expires / Resilies</div>
+  <div id="d-alert-res"></div>
+  <div class="section-title">Alertes — Expire dans 30 jours</div>
+  <div id="d-alert-bi"></div>
+</div>
+
+<!-- PAGE CONTRATS -->
+<div id="page-contrats" class="page">
+  <div class="search-row">
+    <input id="search-contrat" placeholder="Rechercher contrat..." oninput="renderContrats()" />
+    <select id="filter-contrat" onchange="renderContrats()">
+      <option value="">Tous</option>
+      <option value="actif">Actif</option>
+      <option value="expire">Expire</option>
+    </select>
+  </div>
+  <div id="contrats-list" style="padding:0 12px"></div>
+</div>
+
+<!-- PAGE RECHERCHE -->
+<div id="page-search" class="page">
+  <div class="search-page">
+    <input id="big-search" placeholder="Rechercher societe, RC, ICE, activite..." oninput="bigSearch()" />
+    <div id="search-results"></div>
+  </div>
+</div>
+
+<!-- PAGE PARAMETRES -->
+<div id="page-params" class="page">
+  <div style="padding:12px">
+    <div style="background:#fff;border-radius:10px;border:0.5px solid #dde3ec;padding:14px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:10px">SAM HARMONIE</div>
+      <div style="font-size:11px;color:#666;line-height:1.8">
+        RC: 142639<br>
+        ICE: 003509603000019<br>
+        Adresse: LOT AL WAHDA FATH AL KHIR N 60, Temara<br>
+        Activite: Centre de Domiciliation — Conseil de Gestion<br>
+        Gerant: EL MBARKI AYOUB<br>
+        Date creation: 29/05/2024
+      </div>
+    </div>
+    <div style="background:#fff;border-radius:10px;border:0.5px solid #dde3ec;padding:14px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:10px">Statistiques</div>
+      <div id="param-stats" style="font-size:11px;color:#666;line-height:2"></div>
+    </div>
+    <div style="background:#fff;border-radius:10px;border:0.5px solid #dde3ec;padding:14px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:4px">Sauvegarde manuelle</div>
+      <div style="font-size:11px;color:#888;margin-bottom:10px">Exportez vos donnees et reimportez-les a tout moment</div>
+      <button class="btn btn-blue" style="width:100%;margin-bottom:8px" onclick="exportJSON()">Exporter sauvegarde (.json)</button>
+      <label class="btn btn-blue" style="width:100%;display:block;text-align:center;margin-bottom:8px;cursor:pointer;background:#276221">
+        Importer sauvegarde (.json)
+        <input type="file" accept=".json" style="display:none" onchange="importJSON(this)" />
+      </label>
+      <div id="last-backup" style="font-size:10px;color:#888;text-align:center"></div>
+    </div>
+    <div style="background:#fff;border-radius:10px;border:0.5px solid #dde3ec;padding:14px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:4px">Google Drive</div>
+      <div style="font-size:11px;color:#888;margin-bottom:10px">Sauvegarde automatique sur votre Google Drive</div>
+      <div id="gdrive-status" style="font-size:11px;color:#888;margin-bottom:8px;text-align:center">Non connecte</div>
+      <button class="btn btn-blue" id="gdrive-btn" style="width:100%;margin-bottom:8px" onclick="gdriveConnect()">Connecter Google Drive</button>
+      <button class="btn" id="gdrive-save-btn" style="width:100%;margin-bottom:8px;background:#C6EFCE;color:#276221;display:none" onclick="gdriveSave()">Sauvegarder maintenant</button>
+      <button class="btn" id="gdrive-restore-btn" style="width:100%;background:#EBF3FB;color:#1F4E79;display:none" onclick="gdriveRestore()">Restaurer depuis Drive</button>
+    </div>
+    <div style="background:#fff;border-radius:10px;border:0.5px solid #dde3ec;padding:14px;margin-bottom:10px">
+      <div style="font-size:13px;font-weight:700;color:var(--blue);margin-bottom:10px">Rapports</div>
+      <button class="btn btn-blue" style="width:100%;margin-bottom:8px" onclick="exportPDF()">Telecharger PDF</button>
+      <button class="btn btn-blue" style="width:100%;margin-bottom:8px;background:#534AB7" onclick="exportCSV()">Telecharger CSV</button>
+      <button class="btn" style="width:100%;background:#FFC7CE;color:var(--red)" onclick="resetData()">Reinitialiser les donnees</button>
+    </div>
+  </div>
+</div>
+
+<!-- FAB -->
+<button class="fab" id="fab" onclick="openAdd()">+</button>
+
+<!-- BOTTOM NAV -->
+<div class="bottomnav">
+  <button class="nav-btn active" id="nav-liste" onclick="showPage('liste')"><span class="ni">&#9776;</span>Liste</button>
+  <button class="nav-btn" id="nav-dash" onclick="showPage('dash')"><span class="ni">&#128200;</span>Dashboard</button>
+  <button class="nav-btn" id="nav-contrats" onclick="showPage('contrats')"><span class="ni">&#128196;</span>Contrats</button>
+  <button class="nav-btn" id="nav-search" onclick="showPage('search')"><span class="ni">&#128269;</span>Recherche</button>
+  <button class="nav-btn" id="nav-params" onclick="showPage('params')"><span class="ni">&#9881;</span>Parametres</button>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal-bg">
+<div class="modal">
+  <h2 id="modal-title">Ajouter <span onclick="closeModal()">&#10005;</span></h2>
+  <input type="hidden" id="edit-id" />
+  <div class="mf"><label>Raison sociale *</label><input id="f-nom" placeholder="Ex: SOCIETE XYZ SARL AU" /></div>
+  <div class="mfg">
+    <div class="mf"><label>RC</label><input id="f-rc" placeholder="145000" /></div>
+    <div class="mf"><label>Prix/mois (MAD)</label><input type="number" id="f-prix" placeholder="500" /></div>
+  </div>
+  <div class="mf"><label>ICE</label><input id="f-ice" placeholder="003XXXXXXXXXXXX" /></div>
+  <div class="mfg">
+    <div class="mf"><label>Date debut</label><input type="date" id="f-debut" /></div>
+    <div class="mf"><label>Date fin</label><input type="date" id="f-fin" /></div>
+  </div>
+  <div class="mfg">
+    <div class="mf"><label>Telephone</label><input id="f-tel" placeholder="06XXXXXXXX" /></div>
+    <div class="mf"><label>Statut</label>
+      <select id="f-statut">
+        <option value="EN ACTIVITE">EN ACTIVITE</option>
+        <option value="EN COURS DE LIQUIDATION">EN COURS DE LIQUIDATION</option>
+        <option value="EN ATTENTE DE CODIFICATION">EN ATTENTE DE CODIFICATION</option>
+      </select>
+    </div>
+  </div>
+  <div class="mf"><label>Activite</label><textarea id="f-activite" placeholder="Description de l'activite..."></textarea></div>
+  <div class="mf"><label>Notes</label><textarea id="f-notes" placeholder="Notes internes..."></textarea></div>
+  <div class="mfooter">
+    <button class="mc" onclick="closeModal()">Annuler</button>
+    <button class="ms" onclick="saveSociete()">Enregistrer</button>
+  </div>
+</div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script>
+const INITIAL=[
+  ["HR PLUS SARL AU","","","","","500","","EN ACTIVITE",""],
+  ["IPVERT SARL","145703","","","","500","","EN ACTIVITE",""],
+  ["JAWHARA DRIVE SARL AU","146251","","","","500","","EN ACTIVITE",""],
+  ["DRAIJ TRANS SARL AU","147457","","","","500","","EN ACTIVITE",""],
+  ["STARVIVALE SARL","144777","","","","500","","EN ACTIVITE",""],
+  ["STE OUSRAIT","","","","","500","","EN ACTIVITE",""],
+  ["GANZOUN SARL AU","146379","003778521000071","2025-07-21","","500","TRANSPORT DE MARCHANDISES","EN ACTIVITE",""],
+  ["STE ABID ROUTIERS SARL AU","146381","003729056000033","2025-07-21","","500","TRANSPORT DE MARCHANDISES","EN ACTIVITE",""],
+  ["BENSTAR NEGOCE SARL AU","145371","003702769000033","2025-04-04","","500","TRANSPORT; NEGOCIANT; IMPORT EXPORT","EN ACTIVITE",""],
+  ["R&A MOBILITY SARL","146017","003744747000072","2025-06-13","","500","TRANSPORT DE MARCHANDISES","EN ACTIVITE",""],
+  ["DG TRANS SALEM SARL AU","145099","003643963000002","2025-03-07","","500","TRANSPORT DE MARCHANDISES","EN ACTIVITE",""],
+  ["SOFI 7 SERVICES SARL AU","145959","003753130000032","2025-06-05","","500","JARDINAGE ET NETTOYAGES","EN ACTIVITE",""],
+  ["HTONE SARL AU","143735","003586999000095","2024-10-17","","500","NETTOYAGE, TRAVAUX DIVERS","EN ACTIVITE",""],
+  ["SOCIETE ICHRAK NETTOYAGE SARL","144381","003639873000046","2024-12-27","","500","NETTOYAGE - JARDINAGE","EN ACTIVITE",""],
+  ["AV VERT PRO 5 SARL AU","144533","003597377000025","2025-01-20","","500","NETTOYAGE","EN ACTIVITE",""],
+  ["CLEANTY IBOUDA ET SERVICES SARL","143419","003533975000023","","","500","NETTOYAGE","EN ACTIVITE",""],
+  ["NADIF 7 SUR 7 SARL","144599","003627852000051","2025-01-27","","500","TRAVAUX DE NETTOYAGE","EN ACTIVITE",""],
+  ["BENBELLA CONFECTION SARL AU","","","","","500","","EN ACTIVITE",""],
+  ["ILYAS DECO BATIMENT SARL AU","146041","003757993000069","2025-06-17","","500","TRAVAUX DIVERS OU CONSTRUCTION","EN ACTIVITE",""],
+  ["CUBE STONE SARL AU","147327","003828507000010","2025-11-12","","500","TRAVAUX DIVERS / ALUMINUM / METALLIQUE","EN ACTIVITE",""],
+  ["Q8 METAL SARL AU","147863","003879195000007","2026-01-26","","500","TRAVAUX DIVERS OU CONSTRUCTION","EN ACTIVITE",""],
+  ["EIAK DEVELOPPEMENT SARL AU","145759","003730887000066","2025-05-16","","500","TRAVAUX DIVERS OU CONSTRUCTION","EN ACTIVITE",""],
+  ["Z-TIM SARL AU","145607","003715434000003","2025-05-05","","500","TRAVAUX DIVERS OU CONSTRUCTION","EN ACTIVITE",""],
+  ["ARZ BEN SARL AU","147385","003846942000069","2025-11-21","","500","TRAVAUX DIVERS OU CONSTRUCTIONS","EN ACTIVITE",""],
+  ["MK ROMANI MAROC SARL AU","147281","003809623000046","2025-11-07","","500","TRANSPORT POUR MARCHANDISES","EN ACTIVITE",""],
+  ["MSB BUILDING SARL AU","147111","003815346000046","2025-10-20","","500","ENTREPRENEUR DE TRAVAUX DIVERS","EN ACTIVITE",""],
+  ["SOCIETE IGHOUD ZAF SARL","146395","003765237000033","2025-07-22","","500","TRAVAUX DIVERS OU CONSTRUCTION","EN ACTIVITE",""],
+  ["NAFIS TRANS SARL","147979","003856310000012","2026-02-04","","500","TRAVAUX DIVERS OU CONSTRUCTION","EN ATTENTE DE CODIFICATION",""],
+  ["BONYAN UNITED SARL","146903","003797913000093","2025-09-30","","500","CONSTRUCTION DE BATIMENTS","EN ACTIVITE",""],
+  ["J.R.B PROBAT SARL","145725","003737613000048","2025-05-15","","500","PEINTURE EN BATIMENTS","EN ACTIVITE",""],
+  ["FANS TRAVAUX SARL AU","145277","003681139000006","2025-03-24","","500","TRAVAUX D'ALUMINIUM ET INOX","EN ACTIVITE",""],
+  ["EXPERTS FACILITIES SUPPLY SARL AU","146715","003798317000049","2025-09-10","","500","TRAVAUX DIVERS - NEGOCE","EN ACTIVITE",""],
+  ["SK DESIGN SARL","146207","003739331000028","2025-07-02","","500","TRAVAUX DIVERS OU CONSTRUCTIONS","EN ACTIVITE",""],
+  ["TA CONSTRUCTION SARL","145845","003746967000078","2025-05-26","","500","TRAVAUX TOUS CORPS D'ETAT","EN ACTIVITE",""],
+  ["BUILDIVO SARL","146563","003774488000031","2025-08-08","","500","TRAVAUX DE FINITION","EN ACTIVITE",""],
+  ["JAG INNOV SARL AU","145051","003667832000007","2025-03-06","","500","TRAVAUX DIVERS OU CONSTRUCTION","EN ACTIVITE",""],
+  ["CF POLY TRAV BAT SARL","144711","003642262000048","2025-02-07","","500","TRAVAUX DE CONSTRUCTION","EN ACTIVITE",""],
+  ["CHAROUKA SARL AU","144807","003674938000011","2025-02-14","","500","TRAVAUX DE CONSTRUCTION","EN ACTIVITE",""],
+  ["SGM GROUPE SARL AU","144199","003624440000025","2024-12-06","","500","TRAVAUX DIVERS OU CONSTRUCTION","EN ACTIVITE",""],
+  ["PRIME DEPTH CO SARL AU","144753","003665562000090","2025-02-11","","500","TRAVAUX DIVERS OU CONSTRUCTIONS","EN ACTIVITE",""],
+  ["BMH BETON SARL AU","144953","003679024000075","2025-02-24","","500","TRAVAUX DIVERS OU CONSTRUCTION","EN ACTIVITE",""],
+  ["AJYAL RENOVATION SARL AU","144973","003677596000025","2025-02-26","","500","ENTREPRENEUR DE TRAVAUX DIVERS","EN ACTIVITE",""],
+  ["FOURNISYS SARL AU","144765","003669685000028","2025-02-11","","500","TRAVAUX DIVERS OU CONSTRUCTION","EN ACTIVITE",""],
+  ["ZAID BUILDING SARL AU","143473","003555725000011","2024-09-20","","500","TRAVAUX DIVERS OU CONSTRUCTION","EN ACTIVITE",""],
+  ["JAK TEM SARL AU","143611","003577245000001","2024-10-07","","500","TRAVAUX DIVERS OU CONSTRUCTION","EN ACTIVITE",""],
+  ["ALKOTRAV SARL","144441","003650932000019","2025-01-10","","500","TRAVAUX DIVERS OU CONSTRUCTIONS","EN ACTIVITE",""],
+  ["ILYES ELKHDIMI TRANS SARL AU","145375","003632938000081","2025-04-04","","500","TRANSPORT DE MARCHANDISE","EN ACTIVITE",""],
+  ["ENNS TRANS SARL AU","144763","003670636000056","2025-02-11","","500","TRANSPORT DE MARCHANDISE","EN ACTIVITE",""],
+  ["HIJAB TRAVAUX SARL","144789","003670094000043","2025-02-13","","500","TRAVAUX DIVERS OU CONSTRUCTION","EN COURS DE LIQUIDATION",""],
+  ["NAKHEEL AUTOMATION SARL AU","146285","003770479000022","2025-07-10","","500","INSTALLATIONS ELECTRIQUES","EN ACTIVITE",""],
+  ["FOR CONTRACTORS SARL AU","142781","003509659000059","2024-06-07","","500","ELECTRICITE GENERALE","EN ACTIVITE",""],
+  ["ESSAIED ELECTRIC SARL AU","142779","003531150000056","2024-06-07","","500","ELECTRICITE GENERALE","EN ACTIVITE",""],
+  ["COLORIS PRO SARL AU","145349","003700424000007","2025-04-02","","500","PEINTURE EN BATIMENTS","EN ACTIVITE",""],
+  ["KARYO DECO SARL AU","144853","003664517000078","2024-02-18","","500","PEINTURE EN BATIMENTS","EN ACTIVITE",""],
+  ["KREO DESIGNE SARL","147267","003837584000050","2025-11-05","","500","TRAVAUX DE DECORATION","EN ACTIVITE",""],
+  ["BOUASSEL TRADES SARL","144315","003625071000060","2024-12-19","","500","GESTION COMMERCIALE","EN ACTIVITE",""],
+  ["LAHMAMI AGRICOLE SARL","143947","003580109000079","2024-11-07","","500","GESTION D'EXPLOITATION AGRICOLE","EN ACTIVITE",""],
+  ["KHAMOJI CAR SARL AU","146689","003804269000074","2025-09-03","","500","LOCATION DE VOITURES SANS CHAUFFEURS","EN ACTIVITE",""],
+  ["EXCEPTION CARS SARL AU","147463","003846110000029","2025-12-01","","500","LOCATION DES VOITURES","EN ACTIVITE",""],
+  ["TRIPLE X CAR PRO SARL AU","147515","003862260000091","2025-12-04","","500","LOCATION DE VOITURE SANS CHAUFFEUR","EN ACTIVITE",""],
+  ["AABOUICH CAR PRO SARL AU","147517","003855964000042","2025-12-04","","500","LOCATION DE VOITURE SANS CHAUFFEUR","EN ACTIVITE",""],
+  ["THE WITCHER CAR PRO SARL AU","146871","003819002000080","2025-09-25","","500","LOCATION DE VOITURE SANS CHAUFFEUR","EN ACTIVITE",""],
+  ["KARELECH SARL AU","146607","003794803000061","","","500","ELECTRICIEN REPARATEUR","EN ACTIVITE",""],
+  ["MOUSSA MARBRE SARL AU","145323","003700375000069","2025-03-27","","500","IMPORTATION ET EXPORTATION DE MARBRE","EN ACTIVITE",""],
+  ["ELEC MATISME SARL AU","144787","003658494000030","2025-02-13","","500","INSTALLATION DE SYSTEMES DE SURVEILLANCE","EN ACTIVITE",""],
+  ["OPTIBAT CONSULTING SARL AU","146089","003755504000051","2025-06-20","","500","MANAGEMENT DES PROJETS DE CONSTRUCTION","EN ACTIVITE",""],
+  ["NSM SERVICES SARL AU","147723","003866397000039","2026-01-07","","500","PRESTATION D'OFFSHORING","EN ACTIVITE",""],
+  ["AHMED BUKALLAH CONSULTANCIES SARL","147611","003870357000013","2025-12-17","","500","CONSEIL DE GESTION","EN ACTIVITE",""],
+  ["LZ MA PRIVE SARL AU","144271","000168989100095","2024-12-16","","500","CONSEIL DE GESTION","EN COURS DE LIQUIDATION",""],
+  ["D&A CREATION SARL","145249","003694319000039","2025-03-20","","500","CONSEIL DE GESTION","EN ACTIVITE",""],
+  ["AFS ENGINEERING SARL","143397","003509808000013","2024-09-13","","500","CONSEIL DE GESTION","EN ACTIVITE",""],
+  ["AYO IT SERVICES SARL","145453","003702594000005","2025-04-14","","500","DEVELOPPEMENT DE LOGICIELS","EN ACTIVITE",""],
+  ["INFINITYDATA SARL AU","144759","003667475000043","2025-02-11","","500","PROGRAMMEUR ANALYSTE","EN ACTIVITE",""],
+  ["HORIZON ASSISTANCE SARL","146991","003814158000015","2025-10-07","","500","CONSEIL FISCAL","EN ACTIVITE",""],
+  ["MACOFIS SARL","131283","002611899000055","2020-11-17","","500","CONSEIL FISCAL","EN ACTIVITE",""],
+  ["LAGANANI TOURISME SARL AU","147265","003821892000038","2025-11-05","","500","TRANSPORT TOURISTIQUE","EN ACTIVITE",""],
+  ["NOURINE DELICES SARL AU","144941","003674918000066","2025-02-24","","500","PATISSERIE - CREMERIE","EN ACTIVITE",""],
+  ["MAYNE ADVISORY SAS","","","","","500","","EN ACTIVITE",""],
+  ["KATOM SARL AU","145793","003746722000097","2025-05-20","","500","PROMOTION IMMOBILIERE","EN ACTIVITE",""],
+  ["CONPAX IMM SARL AU","147273","003822847000055","2025-11-07","","500","PROMOTION IMMOBILIERE","EN ACTIVITE",""],
+  ["G K N IMMOBILIER","","000187057700090","","","500","","EN ACTIVITE",""],
+  ["SUN PROPERTIES SARL AU","146801","003781570000004","2025-09-22","","500","PROMOTION IMMOBILIERE","EN ACTIVITE",""],
+  ["HAUMAS IMMOBILIER SARL","144649","003654158000023","2025-02-03","","500","PROMOTION IMMOBILIERE","EN ACTIVITE",""],
+  ["SAN CRISTOBAL DE LOS ANGELES SARL AU","143493","003554620000067","2024-09-23","","500","PROMOTEUR IMMOBILIER","EN ACTIVITE",""],
+  ["CIRCUIT EDGE SARL","145177","003660386000065","2025-03-14","","500","PROMOTION IMMOBILIERE","EN ACTIVITE",""],
+  ["RT BATI SARL","","000237735100012","","","500","","EN ACTIVITE",""],
+  ["PROJET PROMODEM SARL","143763","003594491000056","2024-10-21","","500","PROMOTEUR IMMOBILIER","EN ACTIVITE",""],
+  ["MAISON GHALILO SARL AU","144741","003666218000032","2025-02-10","","500","PATISSERIE - CREMERIE","EN ACTIVITE",""],
+  ["BLUVA SARL","144951","003680701000095","2025-02-24","","500","FILTRES D'EAU POTABLE","EN ACTIVITE",""],
+  ["EVO ZENITH SARL","144059","003607855000068","2024-11-22","","500","CONSEIL SPORTIF","EN ACTIVITE",""],
+  ["MSK SMART AGRICOLE SARL AU","146869","003809264000039","2025-09-25","","500","IRRIGATION AGRICOLE ET ENERGIE SOLAIRE","EN ACTIVITE",""],
+  ["YADIBAT SERVA SARL AU","145961","003738481000086","2025-06-05","","500","MENUISERIE ALUMINIUM","EN ACTIVITE",""],
+  ["SR ERO SARL","147749","003856267000009","2026-01-09","","500","MENUISERIE ALUMINIUM","EN ACTIVITE",""],
+  ["CHTAIBI AGRICOLE SARL AU","144069","003578092000024","2024-11-25","","500","GESTION D'EXPLOITATION AGRICOLE","EN ACTIVITE",""],
+  ["KASSIRI SARL","144793","003656713000005","2025-02-14","","500","GESTION COMMERCIALE","EN ACTIVITE",""],
+  ["REVENTE MATERIAUX DE BATIMENT NEGOC","127473","002197007000094","2019-02-22","","500","VENTE DE MATERIAUX DE CONSTRUCTION","EN ACTIVITE",""],
+  ["T.N.Y.M SARL AU","143623","003589001000070","2024-10-07","","500","DEVELOPPEMENT DES APPLICATIONS","EN ACTIVITE",""],
+  ["LAP TECH SARL AU","144303","","2024-12-19","","500","NEGOCIANT","EN ACTIVITE",""],
+  ["HB CLASSIC SARL AU","144301","","2024-12-19","","500","MARCHAND IMPORTATEUR","EN ACTIVITE",""],
+  ["FHC AFRICA GROUP SARL","147177","003821572000045","2025-10-27","","500","COMMERCE","EN ACTIVITE",""],
+  ["ATHLIXAR SARL AU","146679","003790547000028","2025-09-02","","500","IMPORT/EXPORT","EN ACTIVITE",""],
+  ["SOCIETE DE DEVELOPPEMENT D'ASSISTANCE","143351","003551366000043","2024-09-09","","500","IMPORTATION ET EXPORTATION","EN ACTIVITE",""],
+  ["ALMORA TAPIS SARL AU","145073","003678375000041","2025-03-06","","500","IMPORTATION EXPORTATION DE TAPIS","EN ACTIVITE",""],
+  ["HAFIZ CONSULTING SARL AU","145223","002607296000079","2025-03-19","","500","CONSEIL EN GESTION","EN ACTIVITE",""],
+  ["ELBOUHSSAINI ENTREPRISE SARL","143013","003546486000077","2024-07-22","","500","NEGOCIANT","EN COURS DE LIQUIDATION",""],
+  ["EL HACHADI POWER SARL AU","144169","003612952000092","2024-12-04","","500","FOURNITURE D'ELECTRICITE","EN ACTIVITE",""],
+  ["LANGZONE SARL AU","144405","003579727000014","2025-01-03","","500","ACTIVITES DE SOUTIEN A L'ENSEIGNEMENT","EN ACTIVITE",""],
+  ["SAM HARMONIE","142639","003509603000019","2024-05-29","","0","CENTRE DE DOMICILIATION","EN ACTIVITE","SOCIETE MERE"],
+  ["INFORMATIQUE DIGITAL SARL AU","145395","003709756000049","2025-04-08","","500","DISTRIBUTION MATERIELS INFORMATIQUES","EN ACTIVITE",""],
+  ["ATLANTIC GATEWAY SARL AU","145505","003712887000096","2025-04-17","","500","TELECOMMUNICATIONS SANS FIL","EN ACTIVITE",""],
+  ["DIGITAMINE SARL AU","146901","003813507000035","2025-09-30","","500","CONSEIL EN MARKETING DIGITAL","EN ACTIVITE",""],
+  ["DBIA SARL AU","145967","003746036000092","2025-06-05","","500","CONSEIL EN INFORMATIQUE","EN ACTIVITE",""],
+  ["FEROCHDI SARL AU","143169","003563166000088","2024-08-08","","500","MENUISERIE ALUMINIUM","EN ACTIVITE",""],
+  ["LUMINA EDUCATION PRIVE SARL AU","146899","003808841000014","2025-09-30","","500","SOUTIEN SCOLAIRE A DISTANCE","EN ACTIVITE",""],
+  ["HIRE FLOW SARL AU","146533","003792320000075","2025-08-06","","500","ACHAT VENTE LITERIE MEUBLES","EN ACTIVITE",""],
+  ["NEXSUS PROJECT SARL","146993","003814825000048","2025-10-07","","500","ACTIVITES INFORMATIQUES","EN ACTIVITE",""],
+  ["JEMAIME SARL AU","147573","003832762000070","2025-12-10","","500","COMMERCE ELECTRONIQUE DE VETEMENTS","EN ACTIVITE",""],
+  ["BOUYACHOU SERVICES SARL AU","146059","003743498000039","2025-06-18","","500","INSTALLATION DE MACHINES INDUSTRIELLES","EN ACTIVITE",""],
+  ["ASAYROR PACKING SARL AU","145599","003695544000041","2025-05-02","","500","FABRICANT D'EMBALLAGES","EN ACTIVITE",""],
+  ["ALHAMOUD TRAVAUX AGERI SARL AU","146289","003775567000095","2025-07-11","","500","FORAGE DE PUITS","EN ACTIVITE",""],
+  ["RHAFOUR 24 SARL AU","147481","003844648000024","2025-12-02","","500","ELEVAGE ET PRODUCTION ANIMALE","EN ACTIVITE",""],
+  ["BAYT ALMAKHAWIR SARL AU","144475","003655018000083","2025-01-15","","500","GESTION COMMERCIAL PRET A PORTER","EN COURS DE LIQUIDATION",""],
+  ["BOUASSEL TRADES SARL (2)","144315","003625071000060","2024-12-19","","500","GESTION COMMERCIALE","EN ACTIVITE",""],
+  ["BAYOUD SYSTEME SARL AU","144855","003677035000040","2025-02-18","","500","ENTREPRENEUR DE TRAVAUX DIVERS","EN ACTIVITE",""],
+  ["M & A STORE SARL AU","143205","003552377000003","2024-08-13","","500","NEGOCE ACHAT VENTE PRODUITS ALIMENTAIRES","EN ACTIVITE",""],
+  ["VIPANA SARL AU","145071","003664527000002","2025-03-06","","500","CAFE MILK BAR RESTAURATION","EN ACTIVITE",""],
+  ["ZR CAR PRO LUCE SARL","147313","003847505000097","2025-11-11","","500","LOCATION DE VOITURE SANS CHAUFFEUR","EN ACTIVITE",""],
+  ["HORIZON ASSISTANCE SHA SARL","146991","003814158000015","2025-10-07","","500","CONSEIL FISCAL","EN ACTIVITE",""]
+];
+
+let data=JSON.parse(localStorage.getItem('sh-pro2')||'null');
+if(!data){
+  data=INITIAL.map(([nom,rc,ice,debut,fin,prix,activite,statut,notes],i)=>({
+    id:i+1,nom,rc:rc||'',ice:ice||'',debut:debut||'',fin:fin||'',
+    prix:prix||'500',tel:'',activite:activite||'',statut:statut||'EN ACTIVITE',notes:notes||''
+  }));
+  save();
+}
+
+function save(){localStorage.setItem('sh-pro2',JSON.stringify(data));}
+
+function getEtat(fin){
+  if(!fin)return'vide';
+  const t=new Date();t.setHours(0,0,0,0);
+  const f=new Date(fin);
+  const d=Math.round((f-t)/86400000);
+  if(d<0)return'resilie';if(d<=30)return'bientot';return'en-cours';
+}
+
+function fmt(d){if(!d)return'—';const[y,m,j]=d.split('-');return`${j}/${m}/${y}`;}
+
+function badgeHtml(e){
+  const l={'en-cours':'En cours','resilie':'Resilie','bientot':'Bientot','vide':'—'};
+  return`<span class="badge ${e}">${l[e]}</span>`;
+}
+
+function getStats(){
+  let total=data.length,ec=0,res=0,bi=0,rev=0,vide=0;
+  data.forEach(x=>{
+    const e=getEtat(x.fin);
+    if(e==='en-cours'){ec++;rev+=parseFloat(x.prix||0);}
+    else if(e==='resilie')res++;
+    else if(e==='bientot'){bi++;ec++;rev+=parseFloat(x.prix||0);}
+    else vide++;
+  });
+  return{total,ec,res,bi,rev,vide};
+}
+
+function updateStats(){
+  const s=getStats();
+  ['s-total','d-total'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=s.total;});
+  ['s-encours','d-ec'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=s.ec;});
+  ['s-resilie','d-res'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=s.res;});
+  ['s-bientot','d-bi'].forEach(id=>{const e=document.getElementById(id);if(e)e.textContent=s.bi;});
+  const rv=document.getElementById('d-revenu');if(rv)rv.textContent=s.rev.toLocaleString('fr-MA')+' MAD';
+  const ra=document.getElementById('d-revenu-annuel');if(ra)ra.textContent='Revenu annuel estimé: '+(s.rev*12).toLocaleString('fr-MA')+' MAD';
+}
+
+function renderListe(){
+  updateStats();
+  const q=document.getElementById('search').value.toLowerCase();
+  const f=document.getElementById('filter').value;
+  const filtered=data.filter(x=>{
+    const e=getEtat(x.fin);
+    return(!q||x.nom.toLowerCase().includes(q)||x.rc.includes(q))&&(!f||e===f);
+  });
+  document.getElementById('liste').innerHTML=filtered.map(x=>{
+    const e=getEtat(x.fin);
+    const jours=x.fin?Math.round((new Date(x.fin)-new Date())/86400000):'';
+    const jourstxt=jours!==''?(jours<0?`Expire il y a ${Math.abs(jours)}j`:`${jours}j restants`):'';
+    return`<div class="item">
+      <div class="item-head" onclick="toggleItem(${x.id})">
+        <div class="item-left">
+          <div class="nom">${x.nom}</div>
+          <div class="sub">RC: ${x.rc||'—'} • ${x.prix||'—'} MAD/mois ${jourstxt?'• '+jourstxt:''}</div>
+        </div>
+        ${badgeHtml(e)}
+      </div>
+      <div class="item-body" id="body-${x.id}">
+        <div class="fg">
+          <div class="f"><label>Date debut</label><input type="date" value="${x.debut||''}" onchange="upd(${x.id},'debut',this.value)"/></div>
+          <div class="f"><label>Date fin</label><input type="date" value="${x.fin||''}" onchange="upd(${x.id},'fin',this.value)"/></div>
+          <div class="f"><label>Prix/mois (MAD)</label><input type="number" value="${x.prix||''}" onchange="upd(${x.id},'prix',this.value)"/></div>
+          <div class="f"><label>ICE</label><input value="${x.ice||''}" onchange="upd(${x.id},'ice',this.value)"/></div>
+        </div>
+        ${x.activite?`<div style="font-size:11px;color:#666;margin-top:8px;padding:6px 8px;background:#f8f9fa;border-radius:6px">${x.activite}</div>`:''}
+        <div class="btn-row">
+          <button class="btn btn-blue" onclick="openEdit(${x.id})">Modifier</button>
+          <button class="btn btn-red" onclick="del(${x.id})">Supprimer</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDash(){
+  updateStats();
+  const s=getStats();
+  const bars=[
+    {label:'En cours',val:s.ec,total:s.total,color:'#276221'},
+    {label:'Resilies',val:s.res,total:s.total,color:'#9C0006'},
+    {label:'Bientot',val:s.bi,total:s.total,color:'#EF9F27'},
+    {label:'Sans date',val:s.vide,total:s.total,color:'#888'}
+  ];
+  document.getElementById('chart-bars').innerHTML=bars.map(b=>{
+    const pct=s.total?Math.round(b.val/s.total*100):0;
+    return`<div class="bar-row">
+      <div class="bar-label">${b.label}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;background:${b.color}"></div></div>
+      <div class="bar-val" style="color:${b.color}">${b.val}</div>
+    </div>`;
+  }).join('');
+  const resilies=data.filter(x=>getEtat(x.fin)==='resilie');
+  const bientot=data.filter(x=>getEtat(x.fin)==='bientot');
+  document.getElementById('d-alert-res').innerHTML=resilies.length?
+    resilies.map(x=>`<div class="alert-item red"><div><div class="an">${x.nom}</div><div class="ad">Fin: ${fmt(x.fin)} • RC: ${x.rc||'—'}</div></div>${badgeHtml('resilie')}</div>`).join('')
+    :'<div style="padding:6px 12px;font-size:11px;color:#888">Aucune societe resiliee</div>';
+  document.getElementById('d-alert-bi').innerHTML=bientot.length?
+    bientot.map(x=>{
+      const d=Math.round((new Date(x.fin)-new Date())/86400000);
+      return`<div class="alert-item orange"><div><div class="an">${x.nom}</div><div class="ad">Fin: ${fmt(x.fin)} • ${d}j restants</div></div>${badgeHtml('bientot')}</div>`;
+    }).join('')
+    :'<div style="padding:6px 12px;font-size:11px;color:#888">Aucune societe expire bientot</div>';
+}
+
+function renderContrats(){
+  const q=(document.getElementById('search-contrat').value||'').toLowerCase();
+  const f=document.getElementById('filter-contrat').value;
+  const filtered=data.filter(x=>{
+    const e=getEtat(x.fin);
+    const hasDate=x.debut&&x.fin;
+    if(f==='actif'&&(e==='resilie'||e==='vide'))return false;
+    if(f==='expire'&&e!=='resilie')return false;
+    return!q||x.nom.toLowerCase().includes(q);
+  });
+  document.getElementById('contrats-list').innerHTML=filtered.map(x=>{
+    const e=getEtat(x.fin);
+    let pct=0,duree='',color='#276221';
+    if(x.debut&&x.fin){
+      const start=new Date(x.debut),end=new Date(x.fin),now=new Date();
+      const total=end-start,elapsed=now-start;
+      pct=Math.min(100,Math.max(0,Math.round(elapsed/total*100)));
+      const mois=Math.round(total/(1000*60*60*24*30));
+      duree=mois+' mois';
+    }
+    if(e==='resilie')color='#E24B4A';
+    else if(e==='bientot')color='#EF9F27';
+    return`<div class="contract-card">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div>
+          <div class="cn">${x.nom}</div>
+          <div class="ci">RC: ${x.rc||'—'} • ICE: ${x.ice||'—'}</div>
+        </div>
+        ${badgeHtml(e)}
+      </div>
+      <div class="cd">
+        <span>Debut: ${fmt(x.debut)}</span>
+        <span>Fin: ${fmt(x.fin)}</span>
+        <span style="color:var(--purple);font-weight:700">${x.prix||'—'} MAD/mois</span>
+      </div>
+      ${x.debut&&x.fin?`<div class="progress-bar"><div class="progress-fill" style="width:${pct}%;background:${color}"></div></div><div style="font-size:10px;color:#888;margin-top:3px;text-align:right">${pct}% ecoule ${duree?'• Duree: '+duree:''}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+function bigSearch(){
+  const q=document.getElementById('big-search').value.toLowerCase();
+  if(!q){document.getElementById('search-results').innerHTML='';return;}
+  const results=data.filter(x=>
+    x.nom.toLowerCase().includes(q)||x.rc.includes(q)||x.ice.includes(q)||
+    x.activite.toLowerCase().includes(q)||x.notes.toLowerCase().includes(q)
+  );
+  document.getElementById('search-results').innerHTML=results.length?
+    results.map(x=>`<div class="search-result">
+      <div class="sr-nom">${x.nom} ${badgeHtml(getEtat(x.fin))}</div>
+      <div class="sr-info">RC: ${x.rc||'—'} • ICE: ${x.ice||'—'} • ${x.prix||'—'} MAD/mois</div>
+      <div class="sr-info" style="margin-top:2px">Debut: ${fmt(x.debut)} • Fin: ${fmt(x.fin)}</div>
+      ${x.activite?`<div class="sr-info" style="margin-top:2px;color:#444">${x.activite.substring(0,80)}...</div>`:''}
+    </div>`).join('')
+    :'<div style="text-align:center;padding:2rem;color:#888;font-size:13px">Aucun resultat</div>';
+}
+
+function renderParams(){
+  const s=getStats();
+  const rev=s.rev;
+  document.getElementById('param-stats').innerHTML=`
+    Total societes: <strong>${s.total}</strong><br>
+    En cours: <strong>${s.ec}</strong><br>
+    Resilies: <strong>${s.res}</strong><br>
+    Expire bientot: <strong>${s.bi}</strong><br>
+    Sans date fin: <strong>${s.vide}</strong><br>
+    Revenu mensuel: <strong>${rev.toLocaleString('fr-MA')} MAD</strong><br>
+    Revenu annuel: <strong>${(rev*12).toLocaleString('fr-MA')} MAD</strong>
+  `;
+}
+
+function toggleItem(id){document.getElementById('body-'+id).classList.toggle('open');}
+
+function upd(id,field,val){
+  const x=data.find(d=>d.id===id);
+  if(x){x[field]=val;save();renderListe();showNotif('Sauvegarde !');}
+}
+
+function showPage(p){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(x=>x.classList.remove('active'));
+  document.getElementById('page-'+p).classList.add('active');
+  document.getElementById('nav-'+p).classList.add('active');
+  document.getElementById('fab').style.display=p==='liste'?'flex':'none';
+  if(p==='dash')renderDash();
+  else if(p==='contrats')renderContrats();
+  else if(p==='params')renderParams();
+}
+
+function openAdd(){
+  document.getElementById('modal-title').innerHTML='Ajouter <span onclick="closeModal()">&#10005;</span>';
+  document.getElementById('edit-id').value='';
+  ['f-nom','f-rc','f-ice','f-debut','f-fin','f-prix','f-tel','f-activite','f-notes'].forEach(id=>document.getElementById(id).value='');
+  document.getElementById('f-statut').value='EN ACTIVITE';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function openEdit(id){
+  const x=data.find(d=>d.id===id);if(!x)return;
+  document.getElementById('modal-title').innerHTML='Modifier <span onclick="closeModal()">&#10005;</span>';
+  document.getElementById('edit-id').value=id;
+  document.getElementById('f-nom').value=x.nom||'';
+  document.getElementById('f-rc').value=x.rc||'';
+  document.getElementById('f-ice').value=x.ice||'';
+  document.getElementById('f-debut').value=x.debut||'';
+  document.getElementById('f-fin').value=x.fin||'';
+  document.getElementById('f-prix').value=x.prix||'';
+  document.getElementById('f-tel').value=x.tel||'';
+  document.getElementById('f-activite').value=x.activite||'';
+  document.getElementById('f-notes').value=x.notes||'';
+  document.getElementById('f-statut').value=x.statut||'EN ACTIVITE';
+  document.getElementById('modal-bg').classList.add('open');
+}
+
+function closeModal(){document.getElementById('modal-bg').classList.remove('open');}
+
+function saveSociete(){
+  const nom=document.getElementById('f-nom').value.trim();
+  if(!nom){alert('Nom obligatoire');return;}
+  const editId=document.getElementById('edit-id').value;
+  const obj={nom,rc:document.getElementById('f-rc').value.trim(),
+    ice:document.getElementById('f-ice').value.trim(),
+    debut:document.getElementById('f-debut').value,
+    fin:document.getElementById('f-fin').value,
+    prix:document.getElementById('f-prix').value,
+    tel:document.getElementById('f-tel').value.trim(),
+    activite:document.getElementById('f-activite').value.trim(),
+    statut:document.getElementById('f-statut').value,
+    notes:document.getElementById('f-notes').value.trim()};
+  if(editId){
+    const x=data.find(d=>d.id===parseInt(editId));
+    if(x)Object.assign(x,obj);
+  } else {
+    data.push({id:Math.max(...data.map(d=>d.id))+1,...obj});
+  }
+  save();renderListe();closeModal();showNotif('Societe enregistree !');
+}
+
+function del(id){
+  if(confirm('Supprimer cette societe ?')){
+    data=data.filter(d=>d.id!==id);save();renderListe();showNotif('Societe supprimee');
+  }
+}
+
+function showNotif(msg){
+  const n=document.getElementById('notif');
+  n.textContent=msg;n.classList.add('show');
+  setTimeout(()=>n.classList.remove('show'),2500);
+}
+
+function exportCSV(){
+  const headers=['N°','Raison Sociale','RC','ICE','Date Debut','Date Fin','Prix/Mois MAD','Etat','Activite','Statut Juridique','Tel','Notes'];
+  const rows=data.map(x=>[x.id,x.nom,x.rc,x.ice,fmt(x.debut),fmt(x.fin),x.prix,
+    {'en-cours':'En cours','resilie':'Resilie','bientot':'Expire bientot','vide':'—'}[getEtat(x.fin)],
+    x.activite,x.statut,x.tel,x.notes]);
+  const csv=[headers,...rows].map(r=>r.map(v=>'"'+(v||'').toString().replace(/"/g,'""')+'"').join(',')).join('\n');
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8'}));
+  a.download='SAM_HARMONIE_'+new Date().toISOString().slice(0,10)+'.csv';a.click();
+  showNotif('CSV telecharge !');
+}
+
+function exportPDF(){
+  if(!window.jspdf){showNotif('PDF non disponible hors ligne');return;}
+  const{jsPDF}=window.jspdf;
+  const doc=new jsPDF({orientation:'landscape',unit:'mm',format:'a4'});
+  const s=getStats();
+  doc.setFillColor(31,78,121);doc.rect(0,0,297,20,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(14);doc.setFont('helvetica','bold');
+  doc.text('SAM HARMONIE - Liste des Societes Domiciliees',10,12);
+  doc.setFontSize(9);doc.setFont('helvetica','normal');
+  doc.text(`Temara | ICE: 003509603000019 | ${new Date().toLocaleDateString('fr-FR')} | Total: ${s.total} | En cours: ${s.ec} | Revenu: ${s.rev.toLocaleString()} MAD/mois`,10,18);
+  const cols=['N°','Raison Sociale','RC','Debut','Fin','Prix MAD','Etat'];
+  const cw=[10,82,22,24,24,22,22];
+  let y=26;
+  doc.setFillColor(31,78,121);doc.rect(8,y,274,7,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(8);doc.setFont('helvetica','bold');
+  let x=10;cols.forEach((c,i)=>{doc.text(c,x,y+5);x+=cw[i];});y+=8;
+  doc.setFont('helvetica','normal');
+  data.forEach((s,i)=>{
+    if(y>193){doc.addPage();y=10;}
+    const e=getEtat(s.fin);
+    if(i%2===0){doc.setFillColor(235,243,251);doc.rect(8,y,274,6,'F');}
+    const eLabel={'en-cours':'En cours','resilie':'Resilie','bientot':'Bientot','vide':'—'}[e];
+    const vals=[s.id,s.nom.length>38?s.nom.substring(0,36)+'..':s.nom,s.rc||'—',fmt(s.debut),fmt(s.fin),(s.prix||'—')+' MAD',eLabel];
+    x=10;
+    vals.forEach((v,j)=>{
+      if(j===6){
+        if(e==='resilie')doc.setTextColor(156,0,6);
+        else if(e==='bientot')doc.setTextColor(123,79,0);
+        else if(e==='en-cours')doc.setTextColor(39,98,33);
+        else doc.setTextColor(128,128,128);
+      } else doc.setTextColor(0,0,0);
+      doc.text(String(v),x,y+4);x+=cw[j];
+    });
+    y+=6;
+  });
+  y+=4;
+  doc.setFillColor(31,78,121);doc.rect(8,y,274,8,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(9);doc.setFont('helvetica','bold');
+  doc.text(`Total: ${data.length} societes | En cours: ${s.ec} | Resilies: ${s.res} | Revenu mensuel: ${s.rev.toLocaleString()} MAD`,10,y+5.5);
+  doc.save('SAM_HARMONIE_'+new Date().toISOString().slice(0,10)+'.pdf');
+  showNotif('PDF telecharge !');
+}
+
+function resetData(){
+  if(confirm('Reinitialiser toutes les donnees ? Cette action est irreversible.')){
+    localStorage.removeItem('sh-pro2');location.reload();
+  }
+}
+
+let deferredPrompt=null;
+window.addEventListener('beforeinstallprompt',e=>{
+  e.preventDefault();deferredPrompt=e;
+  document.getElementById('install-bar').style.display='flex';
+});
+function installApp(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(()=>{
+      deferredPrompt=null;
+      document.getElementById('install-bar').style.display='none';
+    });
+  }
+}
+
+document.getElementById('modal-bg').addEventListener('click',function(e){if(e.target===this)closeModal();});
+
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./sw.js').catch(()=>{});
+}
+
+renderListe();
+</script>
+</body>
+</html>
+<!-- PATCH: Contract Scanner Feature -->
+<script>
+// ============================================================
+// CONTRACT SCANNER - Attach scanned docs to each company
+// ============================================================
+
+// Add contract button to each item in the list
+const _origRenderListe = renderListe;
+renderListe = function() {
+  _origRenderListe();
+  // Patch each item-body to add contract section
+  data.forEach(x => {
+    const body = document.getElementById('body-' + x.id);
+    if (body && !body.querySelector('.contract-section')) {
+      const section = document.createElement('div');
+      section.className = 'contract-section';
+      section.style.cssText = 'margin-top:10px;padding-top:10px;border-top:0.5px solid #eee';
+      section.innerHTML = buildContractSection(x.id);
+      body.insertBefore(section, body.querySelector('.btn-row'));
+    }
+  });
+};
+
+function buildContractSection(id) {
+  const contracts = getContracts(id);
+  const count = contracts.length;
+  return `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+      <div style="font-size:11px;font-weight:700;color:#1F4E79">
+        Contrats scannes (${count})
+      </div>
+      <label style="background:#1F4E79;color:#fff;padding:5px 10px;border-radius:7px;font-size:11px;font-weight:700;cursor:pointer">
+        + Ajouter
+        <input type="file" accept="image/*,application/pdf" capture="environment"
+          style="display:none" onchange="addContract(${id}, this)" />
+      </label>
+    </div>
+    <div id="contracts-${id}">
+      ${renderContracts(id)}
+    </div>
+  `;
+}
+
+function getContracts(id) {
+  try {
+    return JSON.parse(localStorage.getItem('contracts-' + id) || '[]');
+  } catch(e) { return []; }
+}
+
+function saveContracts(id, contracts) {
+  localStorage.setItem('contracts-' + id, JSON.stringify(contracts));
+}
+
+function renderContracts(id) {
+  const contracts = getContracts(id);
+  if (!contracts.length) {
+    return '<div style="font-size:11px;color:#aaa;text-align:center;padding:8px">Aucun contrat attache</div>';
+  }
+  return contracts.map((c, i) => `
+    <div style="background:#f8f9fa;border-radius:8px;padding:8px 10px;margin-bottom:6px;display:flex;align-items:center;gap:8px">
+      <div style="font-size:20px">${c.type === 'pdf' ? '📄' : '🖼️'}</div>
+      <div style="flex:1;min-width:0">
+        <div style="font-size:11px;font-weight:700;color:#222;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${c.name}</div>
+        <div style="font-size:10px;color:#888">${c.date} • ${c.size}</div>
+      </div>
+      <div style="display:flex;gap:4px">
+        <button onclick="viewContract(${id},${i})"
+          style="background:#1F4E79;color:#fff;border:none;border-radius:5px;padding:4px 8px;font-size:10px;cursor:pointer">
+          Voir
+        </button>
+        <button onclick="deleteContract(${id},${i})"
+          style="background:#FFC7CE;color:#9C0006;border:none;border-radius:5px;padding:4px 8px;font-size:10px;cursor:pointer">
+          X
+        </button>
+      </div>
+    </div>
+  `).join('');
+}
+
+function addContract(id, input) {
+  const file = input.files[0];
+  if (!file) return;
+
+  // Check size (max 5MB)
+  if (file.size > 5 * 1024 * 1024) {
+    alert('Fichier trop grand. Maximum 5MB.');
+    return;
+  }
+
+  showNotif('Chargement du contrat...');
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const contracts = getContracts(id);
+    const sizeKB = Math.round(file.size / 1024);
+    const sizeStr = sizeKB > 1024 ? (sizeKB/1024).toFixed(1) + ' MB' : sizeKB + ' KB';
+
+    contracts.push({
+      name: file.name,
+      type: file.type.includes('pdf') ? 'pdf' : 'image',
+      date: new Date().toLocaleDateString('fr-FR'),
+      size: sizeStr,
+      data: e.target.result
+    });
+
+    saveContracts(id, contracts);
+
+    // Refresh the contract list in the UI
+    const container = document.getElementById('contracts-' + id);
+    if (container) container.innerHTML = renderContracts(id);
+
+    // Update the counter
+    const section = container ? container.previousElementSibling : null;
+    if (section) {
+      const countEl = section.querySelector('div');
+      if (countEl) countEl.textContent = `Contrats scannes (${contracts.length})`;
+    }
+
+    showNotif('Contrat ajoute !');
+    input.value = '';
+  };
+
+  reader.onerror = function() {
+    alert('Erreur lors du chargement du fichier');
+  };
+
+  reader.readAsDataURL(file);
+}
+
+function viewContract(id, index) {
+  const contracts = getContracts(id);
+  const contract = contracts[index];
+  if (!contract) return;
+
+  // Open in new tab/window
+  const win = window.open();
+  if (contract.type === 'pdf') {
+    win.document.write(`
+      <html><head><title>${contract.name}</title></head>
+      <body style="margin:0">
+        <embed src="${contract.data}" type="application/pdf" width="100%" height="100%" />
+      </body></html>
+    `);
+  } else {
+    win.document.write(`
+      <html><head><title>${contract.name}</title>
+      <style>body{margin:0;background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh}
+      img{max-width:100%;max-height:100vh;object-fit:contain}</style>
+      </head><body>
+        <img src="${contract.data}" alt="${contract.name}" />
+      </body></html>
+    `);
+  }
+}
+
+function deleteContract(id, index) {
+  if (!confirm('Supprimer ce contrat ?')) return;
+  const contracts = getContracts(id);
+  contracts.splice(index, 1);
+  saveContracts(id, contracts);
+
+  const container = document.getElementById('contracts-' + id);
+  if (container) container.innerHTML = renderContracts(id);
+
+  const section = container ? container.previousElementSibling : null;
+  if (section) {
+    const countEl = section.querySelector('div');
+    if (countEl) countEl.textContent = `Contrats scannes (${contracts.length})`;
+  }
+
+  showNotif('Contrat supprime');
+}
+
+// Also add contract count badge in list items
+const _origToggleItem = toggleItem;
+toggleItem = function(id) {
+  _origToggleItem(id);
+  const body = document.getElementById('body-' + id);
+  if (body && body.classList.contains('open') && !body.querySelector('.contract-section')) {
+    const x = data.find(d => d.id === id);
+    if (x) {
+      const section = document.createElement('div');
+      section.className = 'contract-section';
+      section.style.cssText = 'margin-top:10px;padding-top:10px;border-top:0.5px solid #eee';
+      section.innerHTML = buildContractSection(id);
+      body.insertBefore(section, body.querySelector('.btn-row'));
+    }
+  }
+};
+</script>
+<script>
+// ============================================================
+// BACKUP & RESTORE SYSTEM
+// ============================================================
+
+// Show last backup date on params page
+function showLastBackup() {
+  const lb = localStorage.getItem('sh-last-backup');
+  const el = document.getElementById('last-backup');
+  if (el && lb) el.textContent = 'Derniere sauvegarde: ' + lb;
+}
+
+// EXPORT JSON - complete backup
+function exportJSON() {
+  const backup = {
+    version: '2.0',
+    date: new Date().toISOString(),
+    app: 'SAM HARMONIE',
+    data: data,
+    contracts: {}
+  };
+  // Include all contracts
+  data.forEach(x => {
+    const c = localStorage.getItem('contracts-' + x.id);
+    if (c) backup.contracts[x.id] = JSON.parse(c);
+  });
+  const blob = new Blob([JSON.stringify(backup, null, 2)], {type: 'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'SAM_HARMONIE_backup_' + new Date().toISOString().slice(0,10) + '.json';
+  a.click();
+  const now = new Date().toLocaleString('fr-FR');
+  localStorage.setItem('sh-last-backup', now);
+  showLastBackup();
+  showNotif('Sauvegarde exportee !');
+}
+
+// IMPORT JSON - restore from backup
+function importJSON(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    try {
+      const backup = JSON.parse(e.target.result);
+      if (!backup.data || !Array.isArray(backup.data)) {
+        alert('Fichier invalide. Veuillez utiliser un fichier de sauvegarde SAM HARMONIE.');
+        return;
+      }
+      if (!confirm(`Restaurer ${backup.data.length} societes depuis la sauvegarde du ${backup.date ? new Date(backup.date).toLocaleDateString('fr-FR') : 'date inconnue'} ?\n\nVos donnees actuelles seront remplacees.`)) return;
+
+      // Restore data
+      data = backup.data;
+      localStorage.setItem('sh-pro2', JSON.stringify(data));
+
+      // Restore contracts
+      if (backup.contracts) {
+        Object.entries(backup.contracts).forEach(([id, contracts]) => {
+          localStorage.setItem('contracts-' + id, JSON.stringify(contracts));
+        });
+      }
+
+      const now = new Date().toLocaleString('fr-FR');
+      localStorage.setItem('sh-last-backup', now);
+      showNotif('Donnees restaurees avec succes !');
+      renderListe();
+      showLastBackup();
+    } catch(err) {
+      alert('Erreur: fichier JSON invalide.');
+    }
+  };
+  reader.readAsText(file);
+  input.value = '';
+}
+
+// AUTO-BACKUP every time data changes
+const _origSave = save;
+save = function() {
+  _origSave();
+  // Auto-save backup every 10 changes
+  let count = parseInt(localStorage.getItem('sh-change-count') || '0') + 1;
+  localStorage.setItem('sh-change-count', count);
+  if (count % 10 === 0) {
+    autoBackup();
+  }
+};
+
+function autoBackup() {
+  const backup = {
+    version: '2.0',
+    date: new Date().toISOString(),
+    app: 'SAM HARMONIE',
+    data: data,
+    contracts: {}
+  };
+  data.forEach(x => {
+    const c = localStorage.getItem('contracts-' + x.id);
+    if (c) backup.contracts[x.id] = JSON.parse(c);
+  });
+  localStorage.setItem('sh-auto-backup', JSON.stringify(backup));
+  localStorage.setItem('sh-last-backup', new Date().toLocaleString('fr-FR'));
+}
+
+// ============================================================
+// GOOGLE DRIVE INTEGRATION
+// ============================================================
+const GDRIVE_KEY = 'AIzaSyD-SAM-HARMONIE-PLACEHOLDER';
+const GDRIVE_CLIENT_ID = 'YOUR_CLIENT_ID';
+const DRIVE_FILE_NAME = 'SAM_HARMONIE_backup.json';
+
+let gdriveToken = localStorage.getItem('sh-gdrive-token') || null;
+let gdriveFolderId = localStorage.getItem('sh-gdrive-folder') || null;
+let gdriveFileId = localStorage.getItem('sh-gdrive-fileid') || null;
+
+function updateGdriveUI() {
+  const status = document.getElementById('gdrive-status');
+  const btn = document.getElementById('gdrive-btn');
+  const saveBtn = document.getElementById('gdrive-save-btn');
+  const restoreBtn = document.getElementById('gdrive-restore-btn');
+  if (!status) return;
+
+  const lastSync = localStorage.getItem('sh-gdrive-lastsync');
+  if (gdriveToken) {
+    status.innerHTML = '<span style="color:#276221;font-weight:700">Connecte</span>' +
+      (lastSync ? '<br><span style="color:#888">Derniere sync: ' + lastSync + '</span>' : '');
+    if (btn) btn.textContent = 'Deconnecter';
+    if (saveBtn) saveBtn.style.display = 'block';
+    if (restoreBtn) restoreBtn.style.display = 'block';
+  } else {
+    status.textContent = 'Non connecte';
+    if (btn) btn.textContent = 'Connecter Google Drive';
+    if (saveBtn) saveBtn.style.display = 'none';
+    if (restoreBtn) restoreBtn.style.display = 'none';
+  }
+}
+
+function gdriveConnect() {
+  if (gdriveToken) {
+    // Disconnect
+    if (confirm('Deconnecter Google Drive ?')) {
+      gdriveToken = null;
+      localStorage.removeItem('sh-gdrive-token');
+      updateGdriveUI();
+      showNotif('Google Drive deconnecte');
+    }
+    return;
+  }
+  // Open Google OAuth
+  const CLIENT_ID = localStorage.getItem('sh-gdrive-clientid') || '';
+  if (!CLIENT_ID) {
+    // Ask for client ID
+    const id = prompt(
+      'Pour connecter Google Drive, vous avez besoin d\'un Client ID Google.\n\n' +
+      '1. Allez sur console.cloud.google.com\n' +
+      '2. Creez un projet\n' +
+      '3. Activez Google Drive API\n' +
+      '4. Creez des identifiants OAuth 2.0\n' +
+      '5. Copiez le Client ID ici:\n\n' +
+      'Ou entrez "demo" pour une simulation offline:'
+    );
+    if (!id) return;
+    if (id.toLowerCase() === 'demo') {
+      // Demo mode - simulate connection
+      gdriveToken = 'demo-token';
+      localStorage.setItem('sh-gdrive-token', gdriveToken);
+      localStorage.setItem('sh-gdrive-mode', 'demo');
+      updateGdriveUI();
+      showNotif('Google Drive connecte (mode demo)');
+      return;
+    }
+    localStorage.setItem('sh-gdrive-clientid', id);
+  }
+
+  const authUrl = 'https://accounts.google.com/o/oauth2/auth?' +
+    'client_id=' + encodeURIComponent(localStorage.getItem('sh-gdrive-clientid')) +
+    '&redirect_uri=' + encodeURIComponent(window.location.href) +
+    '&scope=' + encodeURIComponent('https://www.googleapis.com/auth/drive.file') +
+    '&response_type=token' +
+    '&prompt=consent';
+
+  window.location.href = authUrl;
+}
+
+// Handle OAuth callback
+function handleOAuthCallback() {
+  const hash = window.location.hash;
+  if (hash.includes('access_token')) {
+    const params = new URLSearchParams(hash.substring(1));
+    const token = params.get('access_token');
+    if (token) {
+      gdriveToken = token;
+      localStorage.setItem('sh-gdrive-token', token);
+      window.location.hash = '';
+      updateGdriveUI();
+      showNotif('Google Drive connecte !');
+    }
+  }
+}
+
+async function gdriveSave() {
+  if (!gdriveToken) { showNotif('Connectez Google Drive dabord'); return; }
+
+  const backup = {
+    version: '2.0',
+    date: new Date().toISOString(),
+    app: 'SAM HARMONIE',
+    data: data,
+    contracts: {}
+  };
+  data.forEach(x => {
+    const c = localStorage.getItem('contracts-' + x.id);
+    if (c) backup.contracts[x.id] = JSON.parse(c);
+  });
+  const content = JSON.stringify(backup, null, 2);
+
+  // Demo mode - just save locally and show success
+  if (localStorage.getItem('sh-gdrive-mode') === 'demo') {
+    localStorage.setItem('sh-gdrive-backup', content);
+    const now = new Date().toLocaleString('fr-FR');
+    localStorage.setItem('sh-gdrive-lastsync', now);
+    updateGdriveUI();
+    showNotif('Sauvegarde sur Drive (demo) !');
+    return;
+  }
+
+  showNotif('Sauvegarde en cours...');
+  try {
+    let url, method;
+    const fileContent = new Blob([content], {type: 'application/json'});
+
+    if (gdriveFileId) {
+      url = `https://www.googleapis.com/upload/drive/v3/files/${gdriveFileId}?uploadType=media`;
+      method = 'PATCH';
+    } else {
+      // Create new file
+      const meta = await fetch('https://www.googleapis.com/drive/v3/files', {
+        method: 'POST',
+        headers: {
+          'Authorization': 'Bearer ' + gdriveToken,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({name: DRIVE_FILE_NAME, mimeType: 'application/json'})
+      }).then(r => r.json());
+      gdriveFileId = meta.id;
+      localStorage.setItem('sh-gdrive-fileid', gdriveFileId);
+      url = `https://www.googleapis.com/upload/drive/v3/files/${gdriveFileId}?uploadType=media`;
+      method = 'PATCH';
+    }
+
+    await fetch(url, {
+      method,
+      headers: {'Authorization': 'Bearer ' + gdriveToken, 'Content-Type': 'application/json'},
+      body: content
+    });
+
+    const now = new Date().toLocaleString('fr-FR');
+    localStorage.setItem('sh-gdrive-lastsync', now);
+    updateGdriveUI();
+    showNotif('Sauvegarde Drive reussie !');
+  } catch(err) {
+    showNotif('Erreur Drive. Verifiez la connexion.');
+  }
+}
+
+async function gdriveRestore() {
+  if (!gdriveToken) { showNotif('Connectez Google Drive dabord'); return; }
+
+  // Demo mode
+  if (localStorage.getItem('sh-gdrive-mode') === 'demo') {
+    const backup = localStorage.getItem('sh-gdrive-backup');
+    if (!backup) { showNotif('Aucune sauvegarde trouvee'); return; }
+    try {
+      const parsed = JSON.parse(backup);
+      if (!confirm(`Restaurer ${parsed.data.length} societes depuis Drive ?`)) return;
+      data = parsed.data;
+      localStorage.setItem('sh-pro2', JSON.stringify(data));
+      if (parsed.contracts) {
+        Object.entries(parsed.contracts).forEach(([id, c]) => {
+          localStorage.setItem('contracts-' + id, JSON.stringify(c));
+        });
+      }
+      renderListe();
+      showNotif('Donnees restaurees depuis Drive !');
+    } catch(e) { showNotif('Erreur de restauration'); }
+    return;
+  }
+
+  if (!gdriveFileId) { showNotif('Aucune sauvegarde trouvee sur Drive'); return; }
+  showNotif('Restauration en cours...');
+  try {
+    const res = await fetch(
+      `https://www.googleapis.com/drive/v3/files/${gdriveFileId}?alt=media`,
+      {headers: {'Authorization': 'Bearer ' + gdriveToken}}
+    );
+    const backup = await res.json();
+    if (!confirm(`Restaurer ${backup.data.length} societes depuis Drive ?`)) return;
+    data = backup.data;
+    localStorage.setItem('sh-pro2', JSON.stringify(data));
+    if (backup.contracts) {
+      Object.entries(backup.contracts).forEach(([id, c]) => {
+        localStorage.setItem('contracts-' + id, JSON.stringify(c));
+      });
+    }
+    renderListe();
+    showNotif('Restauration Drive reussie !');
+  } catch(err) {
+    showNotif('Erreur lors de la restauration');
+  }
+}
+
+// Init
+handleOAuthCallback();
+updateGdriveUI();
+showLastBackup();
+</script>
