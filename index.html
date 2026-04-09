@@ -293,14 +293,36 @@ body{font-family:Arial,sans-serif;background:#f0f4fa;padding-bottom:65px;min-hei
     <div class="mf"><label>Date fin</label><input type="date" id="f-fin" /></div>
   </div>
   <div class="mfg">
-    <div class="mf"><label>Telephone</label><input id="f-tel" placeholder="06XXXXXXXX" /></div>
-    <div class="mf"><label>Statut</label>
-      <select id="f-statut">
-        <option value="EN ACTIVITE">EN ACTIVITE</option>
-        <option value="EN COURS DE LIQUIDATION">EN COURS DE LIQUIDATION</option>
-        <option value="EN ATTENTE DE CODIFICATION">EN ATTENTE DE CODIFICATION</option>
-      </select>
+    <div class="mf"><label>Telephone client</label><input id="f-tel" placeholder="06XXXXXXXX" type="tel" /></div>
+    <div class="mf"><label>Tel. comptable</label><input id="f-tel2" placeholder="06XXXXXXXX" type="tel" /></div>
+  </div>
+  <div class="mf"><label>Statut juridique</label>
+    <select id="f-statut">
+      <option value="EN ACTIVITE">EN ACTIVITE</option>
+      <option value="EN COURS DE LIQUIDATION">EN COURS DE LIQUIDATION</option>
+      <option value="EN ATTENTE DE CODIFICATION">EN ATTENTE DE CODIFICATION</option>
+    </select>
+  </div>
+  <div class="mf" style="background:#EBF3FB;border-radius:8px;padding:10px;margin-top:4px">
+    <label style="color:#1F4E79;font-weight:700;font-size:12px">Calculateur de contrat</label>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px">
+      <div>
+        <label style="font-size:10px;color:#666;display:block;margin-bottom:3px">Prix mensuel (MAD)</label>
+        <input type="number" id="calc-prix" placeholder="ex: 150" min="0" oninput="calcContrat()" style="width:100%;font-size:13px;padding:6px 8px;border:1px solid #ccc;border-radius:6px" />
+      </div>
+      <div>
+        <label style="font-size:10px;color:#666;display:block;margin-bottom:3px">Duree (mois)</label>
+        <select id="calc-duree" onchange="calcContrat()" style="width:100%;font-size:13px;padding:6px 8px;border:1px solid #ccc;border-radius:6px">
+          <option value="6">6 mois (minimum)</option>
+          <option value="12">12 mois (1 an)</option>
+          <option value="18">18 mois</option>
+          <option value="24">24 mois (2 ans)</option>
+          <option value="36">36 mois (3 ans)</option>
+        </select>
+      </div>
     </div>
+    <div id="calc-result" style="margin-top:8px;padding:8px;background:#fff;border-radius:6px;font-size:12px;color:#1F4E79;font-weight:700;text-align:center;display:none"></div>
+    <button type="button" onclick="appliquerContrat()" style="width:100%;margin-top:8px;padding:8px;background:#1F4E79;color:#fff;border:none;border-radius:6px;font-size:12px;font-weight:700;cursor:pointer">Appliquer les dates et le prix</button>
   </div>
   <div class="mf"><label>Activite</label><textarea id="f-activite" placeholder="Description de l'activite..."></textarea></div>
   <div class="mf"><label>Notes</label><textarea id="f-notes" placeholder="Notes internes..."></textarea></div>
@@ -520,6 +542,10 @@ function renderListe(){
           <div class="f"><label>ICE</label><input value="${x.ice||''}" onchange="upd(${x.id},'ice',this.value)"/></div>
         </div>
         ${x.activite?`<div style="font-size:11px;color:#666;margin-top:8px;padding:6px 8px;background:#f8f9fa;border-radius:6px">${x.activite}</div>`:''}
+        <div style="display:flex;gap:10px;margin-top:6px;flex-wrap:wrap">
+          ${x.tel?`<a href="tel:${x.tel}" style="font-size:11px;color:#1F4E79;font-weight:700;text-decoration:none;background:#EBF3FB;padding:4px 10px;border-radius:20px">Tel: ${x.tel}</a>`:''}
+          ${x.tel2?`<a href="tel:${x.tel2}" style="font-size:11px;color:#534AB7;font-weight:700;text-decoration:none;background:#EEEDFE;padding:4px 10px;border-radius:20px">Comptable: ${x.tel2}</a>`:''}
+        </div>
         <div class="btn-row">
           <button class="btn btn-blue" onclick="openEdit(${x.id})">Modifier</button>
           <button class="btn btn-red" onclick="del(${x.id})">Supprimer</button>
@@ -667,6 +693,7 @@ function openEdit(id){
   document.getElementById('f-fin').value=x.fin||'';
   document.getElementById('f-prix').value=x.prix||'';
   document.getElementById('f-tel').value=x.tel||'';
+  document.getElementById('f-tel2').value=x.tel2||'';
   document.getElementById('f-activite').value=x.activite||'';
   document.getElementById('f-notes').value=x.notes||'';
   document.getElementById('f-statut').value=x.statut||'EN ACTIVITE';
@@ -1299,4 +1326,54 @@ async function gdriveRestore() {
 handleOAuthCallback();
 updateGdriveUI();
 showLastBackup();
+
+// ============================================================
+// CALCULATEUR DE CONTRAT
+// ============================================================
+function calcContrat() {
+  const prix = parseFloat(document.getElementById('calc-prix').value) || 0;
+  const duree = parseInt(document.getElementById('calc-duree').value) || 6;
+  const result = document.getElementById('calc-result');
+  
+  if (prix <= 0) { result.style.display='none'; return; }
+  
+  const total = prix * duree;
+  const ans = duree >= 12 ? Math.floor(duree/12) + ' an' + (duree >= 24 ? 's' : '') : '';
+  const moisReste = duree % 12;
+  const dureeLabel = ans + (moisReste > 0 ? (ans?' et ':'')+moisReste+' mois' : '');
+  
+  result.style.display = 'block';
+  result.innerHTML = `
+    <div style="font-size:11px;color:#666;margin-bottom:4px">Recapitulatif du contrat</div>
+    <div style="font-size:16px;color:#1F4E79;font-weight:700">${prix.toLocaleString('fr-MA')} MAD x ${duree} mois = <span style="color:#276221;font-size:18px">${total.toLocaleString('fr-MA')} MAD</span></div>
+    <div style="font-size:11px;color:#888;margin-top:4px">Duree: ${dureeLabel || duree+' mois'} | Prix mensuel: ${prix.toLocaleString('fr-MA')} MAD</div>
+  `;
+}
+
+function appliquerContrat() {
+  const prix = document.getElementById('calc-prix').value;
+  const duree = parseInt(document.getElementById('calc-duree').value) || 6;
+  
+  if (!prix || parseFloat(prix) <= 0) {
+    alert('Entrez un prix mensuel dabord');
+    return;
+  }
+  
+  // Set price
+  document.getElementById('f-prix').value = prix;
+  
+  // Calculate dates
+  const debut = document.getElementById('f-debut').value || new Date().toISOString().slice(0,10);
+  document.getElementById('f-debut').value = debut;
+  
+  // Calculate end date
+  const startDate = new Date(debut);
+  startDate.setMonth(startDate.getMonth() + duree);
+  const fin = startDate.toISOString().slice(0,10);
+  document.getElementById('f-fin').value = fin;
+  
+  const total = parseFloat(prix) * duree;
+  showNotif(`Contrat applique: ${parseFloat(prix).toLocaleString('fr-MA')} MAD x ${duree} mois = ${total.toLocaleString('fr-MA')} MAD`);
+}
+
 </script>
