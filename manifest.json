@@ -2,16 +2,44 @@
   "name": "SAM HARMONIE PRO",
   "short_name": "SAM HARMONIE",
   "description": "Application de suivi des societes domiciliees - SAM HARMONIE Temara Maroc",
-  "start_url": "./index.html",
+  "id": "com.samharmonie.domiciliation",
+  "start_url": "/sam-harmonie/index.html",
+  "scope": "/sam-harmonie/",
   "display": "standalone",
-  "background_color": "#1F4E79",
+  "background_color": "#0D2137",
   "theme_color": "#1F4E79",
   "orientation": "portrait",
   "lang": "fr",
-  "scope": "./",
   "categories": ["business", "productivity"],
+  "prefer_related_applications": false,
   "icons": [
-    {"src":"icon-192.png","sizes":"192x192","type":"image/png","purpose":"any maskable"},
-    {"src":"icon-512.png","sizes":"512x512","type":"image/png","purpose":"any maskable"}
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "SAM HARMONIE - Liste des societes"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Liste des societes",
+      "url": "/sam-harmonie/index.html",
+      "description": "Voir la liste des societes domiciliees"
+    }
   ]
 }
